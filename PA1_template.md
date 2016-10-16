@@ -42,7 +42,7 @@ Mean and median of number of steps are 1.0766189\times 10^{4} and 10765
 ## What is the average daily activity pattern?
 
 ```r
-meanStepsByDay <- activity  %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(meanSteps=mean(steps))
+meanStepsByDay <- activity %>% group_by(interval) %>% summarise(meanSteps=mean(steps,na.rm=TRUE))
 #(1) Average steps time series.
 ggplot(meanStepsByDay,aes(x=interval,y=meanSteps))+geom_line()+ggtitle("Time series of average number \nof steps taken accross all days")+labs(x="Time",y="Number of mean steps")
 ```
@@ -72,20 +72,20 @@ Total number of missing values: 2304
 meanValue <- as.integer(mean(activity$steps,na.rm=TRUE))
 activityNoNA <- activity
 activityNoNA[is.na(activityNoNA$steps),"steps"] <- meanValue
-meanStepsByDayNoNA <- activityNoNA  %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(meanSteps=mean(steps))
-#(1) Average steps time series.
-ggplot(meanStepsByDayNoNA,aes(x=interval,y=meanSteps))+geom_line()+ggtitle("Time series of average number \nof steps taken accross all days")+labs(x="Time",y="Number of mean steps")
+numStepsByDayNoNA <- activityNoNA %>% group_by(date) %>% summarise(numSteps = sum(steps))
+#(3) Plot the histogram of steps.
+ggplot(numStepsByDayNoNA,aes(numSteps)) + geom_histogram(na.rm = TRUE,color="black",fill="white",binwidth = 1000)+ggtitle("Histogram of the total number \n of steps taken each day")+labs(x="Number of steps",y="Frequency")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-#(2)Max mean number of steps across all days
-maxNumStepsNoNA <- with(meanStepsByDayNoNA,interval[meanSteps==max(meanSteps)])
+#(4) Mean and median of the total number of steps taken per day
+stepsMeanNoNA <- mean(numStepsByDayNoNA$numSteps,na.rm=TRUE)
+stepsMedianNoNA <- median(numStepsByDayNoNA$numSteps,na.rm=TRUE)
 ```
 
-Max mean number of steps after missing value filled in: 835
-
+Mean and median of number of steps after missing values filled in are 1.0751738\times 10^{4} and 10656
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
